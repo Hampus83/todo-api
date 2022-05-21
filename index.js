@@ -172,19 +172,36 @@ app.get('/api/todo', (request, response) => {
 });
 
 app.get('/api/todo/search', (request, response) => {
-    const maxResults = request.query.max;
-    const result = [];
+    const page = request.query.page;
 
-    for (let i = 0; i < maxResults; i++) {
-        result.push(todos[i]);
-        todos[i].createdAt = Date();
-        todos[i].id = result.length;
+    let limit = 5;
+    const searchTodos = [...todos];
+    let searchIndex = todos.length - (limit * page);
+
+    if (searchIndex < 0 && searchIndex + limit < 0) {
+        response.send('No more todos');
+    } else if (searchIndex < 0) {
+        limit = searchIndex + limit;
+        searchIndex = 0;
+        response.json(searchTodos.splice(searchIndex, limit));
+    } else {
+        response.json(searchTodos.splice(searchIndex, limit));
     }
 
-    resObj = result;
+    // const result = [];
 
-    response.json(resObj);
-    console.log(resObj);
+    // for (let i = 0; i < maxResults; i++) {
+    //     result.push(todos[i]);
+    //     todos[i].createdAt = Date();
+    //     todos[i].id = result.length;
+    // }
+
+    // todos.splice(todos.length - 30, 20);
+
+    // resObj = result;
+
+    // response.json(todos);
+    // console.log(resObj);
 });
 
 app.post('/api/todo', (request, response) => {
